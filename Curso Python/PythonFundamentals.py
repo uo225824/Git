@@ -199,3 +199,11 @@ print(n)
 
 o=np.linspace(0,4,9) # return 9 evenly spaced values from 0 to 4
 print(o)
+
+o.resize(3,3)
+print(o)
+
+np.ones((2,3))
+np.zeros((2,3))
+np.eye((3))
+np.diag(y)
