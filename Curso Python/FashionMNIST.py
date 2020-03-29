@@ -21,11 +21,12 @@ print(tf.__version__)
 
 class myCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs={}):
-    if(logs.get('loss')<0.3):
+    if(logs.get('loss')<0.3):#'accuracy'
       print("\nReached 96% accuracy so cancelling training!")
       self.model.stop_training = True
 
 callbacks = myCallback()
+
 
 #Model nn
 
