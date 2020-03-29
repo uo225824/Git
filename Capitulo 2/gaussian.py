@@ -51,5 +51,3 @@ theta = np.arange(0,2.1*np.pi,np.pi/20)
 pl.plot(mu[0]+3*s[0]*np.cos(theta),mu[1]+3*s[1]*np.sin(theta), 'k-')
 
 pl.show()
-
-print("hola")
