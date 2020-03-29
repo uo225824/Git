@@ -172,3 +172,30 @@ my_list
 #Numpy
 
 
+import numpy as np
+
+
+#Creating Arrays
+
+print('Numpy')
+mylist=[1,2,3]
+x=np.array(mylist)
+print(x)
+
+
+y=np.array([4,5,6])
+print(y)
+
+m=np.array([[1,2,3],[10,11,12]])
+print(m)
+
+print(m.shape)#dimension
+
+n=np.arange(0,30,2)# start at 0 count up by 2, stop before 30
+print(n)
+
+n=n.reshape(3,5)# Forma 3x5
+print(n)
+
+o=np.linspace(0,4,9) # return 9 evenly spaced values from 0 to 4
+print(o)
