@@ -1,5 +1,6 @@
+import tensorflow as tf
 import numpy as np
-import keras
+from tensorflow import keras
 model=keras.Sequential([keras.layers.Dense(units=1,input_shape=[1])])
 model.compile(optimizer='sgd',loss='mean_squared_error')
 
