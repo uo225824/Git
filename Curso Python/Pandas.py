@@ -157,3 +157,4 @@ print(df['acidez.fija'].unique())#levels
 #NaN
 
 df = df.fillna(method='ffill')#na.omit
+
