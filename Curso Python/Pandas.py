@@ -150,4 +150,10 @@ df['country'] = df.index
 df = df.set_index('acidez.fija')
 print(df.head())
 
+df = df.reset_index()
 
+print(df['acidez.fija'].unique())#levels
+
+#NaN
+
+df = df.fillna(method='ffill')#na.omit
