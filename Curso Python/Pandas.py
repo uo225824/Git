@@ -109,3 +109,45 @@ print(copy_df)
 
 
 #Dataframe Indexing and Loading
+
+costs = df['Cost']
+costs+=2
+
+print(df)
+
+df = pd.read_csv('vinoblanco1.csv', index_col = 0, skiprows=1)
+print(df.head())
+
+df = pd.read_csv('vinoblanco1.csv')#leer csv
+print(df.head())
+print(df.columns)
+
+
+for col in df.columns:
+    if col[:2]=='01':
+        df.rename(columns={col:'Gold' + col[4:]}, inplace=True)
+    if col[:2]=='02':
+        df.rename(columns={col:'Silver' + col[4:]}, inplace=True)
+    if col[:2]=='03':
+        df.rename(columns={col:'Bronze' + col[4:]}, inplace=True)
+    if col[:1]=='№':
+        df.rename(columns={col:'#' + col[1:]}, inplace=True)
+
+print(df.head())
+
+only_gold = df.where(df['acidez.fija'] > 6.3)
+print(only_gold.head())
+print(df['acidez.fija'].count())
+print(only_gold['acidez.fija'].count())
+
+only_gold = only_gold.dropna()
+print(only_gold.head())
+print(df)
+
+#change index
+
+df['country'] = df.index
+df = df.set_index('acidez.fija')
+print(df.head())
+
+
