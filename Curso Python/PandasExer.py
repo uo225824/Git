@@ -21,8 +21,49 @@ df = df.drop('Totals')
 print(df.head())
 
 
+#Question 1
 def answer_one():
     return  df.loc[df['Gold'].idxmax()]
-#print(answer_one())
+print(answer_one())
 
 print(df['Gold'].idxmax())
+
+#Question 2
+
+
+
+def answer_two():
+    df['dif'] = df['Gold'] - df['Gold.1']
+    return(df['dif'].idxmax())
+
+print(answer_two())
+
+
+
+#Question 3
+
+def answer_three():
+    df['difT'] = (df['Gold'] - df['Gold.1'])/(df['Gold'] + df['Gold.1'])
+    return(df.loc[df['difT'].idxmax()])
+
+print(answer_three())
+
+
+#Question 4
+
+
+Points=pd.Series(3*df['Gold.2']+2*df['Silver.2']+df['Bronze.2'])
+
+print(Points)
+
+
+
+
+#Question 5
+
+census_df = pd.read_csv('census.csv')
+
+def answer_five():
+    return census_df.groupby(["STNAME"],sort=False).sum()["COUNTY"].idxmax()
+
+print(answer_five())
