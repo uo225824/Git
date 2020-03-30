@@ -75,3 +75,37 @@ cricket_loving_countries = pd.Series(['Australia',
                                           'Cricket'])
 all_countries = original_sports.append(cricket_loving_countries)
 print(all_countries)
+
+
+
+#Dataframe
+
+
+
+purchase_1 = pd.Series({'Name': 'Chris',
+                        'Item Purchased': 'Dog Food',
+                        'Cost': 22.50})
+purchase_2 = pd.Series({'Name': 'Kevyn',
+                        'Item Purchased': 'Kitty Litter',
+                        'Cost': 2.50})
+purchase_3 = pd.Series({'Name': 'Vinod',
+                        'Item Purchased': 'Bird Seed',
+                        'Cost': 5.00})
+df = pd.DataFrame([purchase_1, purchase_2, purchase_3], index=['Store 1', 'Store 1', 'Store 2'])
+print(df)
+
+print(df.loc['Store 1', 'Cost'])
+print(df.T)#traspose
+
+print(df.loc['Store 1']['Cost'])
+
+print(df.loc[:,['Name', 'Cost']])
+
+print(df.drop('Store 1'))
+
+copy_df = df.copy()
+del copy_df['Name']
+print(copy_df)
+
+
+#Dataframe Indexing and Loading
