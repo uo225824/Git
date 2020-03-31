@@ -47,3 +47,7 @@ model.fit(training_images, training_labels, epochs=50,callbacks=[callbacks])
 
 
 model.evaluate(test_images, test_labels)
+
+from ann_visualizer.visualize import ann_viz;
+
+ann_viz(model, title="My first neural network")
