@@ -17,6 +17,13 @@ Xtrain = Xtrain / 255.0
 
 test = test.values.reshape(-1,28,28,1) / 255.0
 
+class myCallback(tf.keras.callbacks.Callback):
+  def on_epoch_end(self, epoch, logs={}):
+    if(logs.get('accuracy')>0.9999):#'accuracy'
+      print("\nReached 96% accuracy so cancelling training!")
+      self.model.stop_training = True
+
+callbacks = myCallback()
 
 model = tf.keras.models.Sequential([
   tf.keras.layers.Conv2D(64, (3,3), activation='relu', input_shape=(28, 28, 1)),
@@ -30,7 +37,7 @@ model = tf.keras.models.Sequential([
 
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 model.summary()
-model.fit(Xtrain, ytrain, epochs=15)
+model.fit(Xtrain, ytrain, epochs=49,callbacks=[callbacks])
 #test_loss = model.evaluate(test)
 
 
