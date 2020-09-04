@@ -116,7 +116,6 @@ def plot_decision_regions(X, y, classifier, resolution=0.02):
         plt.scatter(x=X[y == cl, 0], y=X[y == cl, 1],alpha=0.8, c=cmap(idx),marker=markers[idx], label=cl)
 
 
-
 plot_decision_regions(X, y, classifier=ppn)
 plt.xlabel('sepal length [cm]')
 plt.ylabel('petal length [cm]')
