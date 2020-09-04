@@ -14,3 +14,12 @@ plt.legend(['Linear', 'Cubic Spline', 'True'])
 plt.axis([-0.05, 6.33, -1.05, 1.05])
 plt.title('Cubic-spline interpolation')
 plt.show()
+
+
+yder = interpolate.splev(xnew, tck, der=1)
+plt.figure()
+plt.plot(xnew, ynew, xnew, np.sin(xnew),'--')
+plt.legend(['Cubic Spline', 'True'])
+plt.axis([-0.05, 6.33, -1.05, 1.05])
+plt.title('Cubic-spline interpolation')
+plt.show()
