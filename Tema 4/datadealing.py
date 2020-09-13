@@ -73,7 +73,7 @@ df['size'].map(inv_size_mapping)
 
 
 class_mapping = {label: idx for idx, label in enumerate(np.unique(df['classlabel']))}
-class_mapping{'class1': 0, 'class2': 1}
+print(class_mapping)
 df['classlabel'] = df['classlabel'].map(class_mapping)
 df
 
@@ -85,3 +85,29 @@ df
 inv_class_mapping = {v: k for k, v in class_mapping.items()}
 df['classlabel'] = df['classlabel'].map(inv_class_mapping)
 df
+
+#Alternative with scikit-learn
+
+from sklearn.preprocessing import LabelEncoder
+class_le = LabelEncoder()
+y = class_le.fit_transform(df['classlabel'].values)
+print(y)
+
+
+#Performing one-hot encoding on nominal features
+
+X = df[['color', 'size', 'price']].values
+color_le = LabelEncoder()
+X[:, 0] = color_le.fit_transform(X[:, 0])
+print(X)
+
+
+from sklearn.preprocessing import OneHotEncoder
+
+ohe = OneHotEncoder(categorical_features=[0])
+ohe.fit_transform(X).toarray()
+pd.get_dummies(df[['price', 'color', 'size']])
+
+
+#PARTITIONING A DATASET IN TRAINING AND TEST SET
+
