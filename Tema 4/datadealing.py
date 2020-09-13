@@ -50,4 +50,38 @@ print(imputed_data)
 print(a)
 
 
-#Categorical data
+#CATEGORICAL DATA
+
+
+df = pd.DataFrame([ ['green', 'M', 10.1, 'class2'], ['red', 'L', 13.5, 'class1'], ['blue', 'XL', 15.3, 'class2']])
+df.columns = ['color', 'size', 'price', 'classlabel']
+print(df)
+
+
+#Change fctor by numbers
+size_mapping = {'XL': 3,'L': 2,'M': 1}
+df['size'] = df['size'].map(size_mapping)
+print(df)
+
+#back to the originals
+inv_size_mapping = {v: k for k, v in size_mapping.items()}
+df['size'].map(inv_size_mapping)
+
+
+
+#ENCODING CLASS LABELS
+
+
+class_mapping = {label: idx for idx, label in enumerate(np.unique(df['classlabel']))}
+class_mapping{'class1': 0, 'class2': 1}
+df['classlabel'] = df['classlabel'].map(class_mapping)
+df
+
+df['classlabel'] = df['classlabel'].map(class_mapping)
+df
+
+#reverse
+
+inv_class_mapping = {v: k for k, v in class_mapping.items()}
+df['classlabel'] = df['classlabel'].map(inv_class_mapping)
+df
