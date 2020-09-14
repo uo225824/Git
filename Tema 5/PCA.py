@@ -55,3 +55,39 @@ plt.legend(loc='best')
 plt.tight_layout()
 # plt.savefig('./figures/pca1.png', dpi=300)
 plt.show()
+
+
+#Feature transformation
+
+
+# Make a list of (eigenvalue, eigenvector) tuples
+eigen_pairs = [(np.abs(eigen_vals[i]), eigen_vecs[:, i])
+               for i in range(len(eigen_vals))]
+
+# Sort the (eigenvalue, eigenvector) tuples from high to low
+eigen_pairs.sort(key=lambda k: k[0], reverse=True)
+
+# Note: I added the `key=lambda k: k[0]` in the sort call above
+# just like I used it further below in the LDA section.
+# This is to avoid problems if there are ties in the eigenvalue
+# arrays (i.e., the sorting algorithm will only regard the
+# first element of the tuples, now).
+
+w = np.hstack((eigen_pairs[0][1][:, np.newaxis],eigen_pairs[1][1][:, np.newaxis]))
+print('Matrix W:\n', w)
+
+
+#Projection
+
+X_train_std[0].dot(w)
+X_train_pca = X_train_std.dot(w)
+colors = ['r', 'b', 'g']
+markers = ['s', 'x', 'o']
+for l, c, m in zip(np.unique(y_train), colors, markers):
+
+    plt.scatter(X_train_pca[y_train==l, 0],X_train_pca[y_train==l, 1],c=c, label=l, marker=m)
+plt.xlabel('PC 1')
+plt.ylabel('PC 2')
+plt.legend(loc='lower left')
+plt.tight_layout()
+plt.show()
