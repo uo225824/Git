@@ -100,14 +100,106 @@ X = df[['color', 'size', 'price']].values
 color_le = LabelEncoder()
 X[:, 0] = color_le.fit_transform(X[:, 0])
 print(X)
-
-
-from sklearn.preprocessing import OneHotEncoder
-
-ohe = OneHotEncoder(categorical_features=[0])
-ohe.fit_transform(X).toarray()
-pd.get_dummies(df[['price', 'color', 'size']])
+#Chapter 4 work with factors
 
 
 #PARTITIONING A DATASET IN TRAINING AND TEST SET
+
+df_wine = pd.read_csv('https://archive.ics.uci.edu/'
+                      'ml/machine-learning-databases/wine/wine.data',
+                      header=None)
+
+df_wine.columns = ['Class label', 'Alcohol', 'Malic acid', 'Ash',
+                   'Alcalinity of ash', 'Magnesium', 'Total phenols',
+                   'Flavanoids', 'Nonflavanoid phenols', 'Proanthocyanins',
+                   'Color intensity', 'Hue', 'OD280/OD315 of diluted wines',
+                   'Proline']
+
+print('Class labels', np.unique(df_wine['Class label']))
+print(df_wine.head())
+
+from sklearn.model_selection import train_test_split
+
+X, y = df_wine.iloc[:, 1:].values, df_wine.iloc[:, 0].values
+
+X_train, X_test, y_train, y_test = \
+    train_test_split(X, y, test_size=0.3, random_state=0,stratify=y)
+
+print(X_train)
+
+
+#Bringing features onto the same scale
+
+from sklearn.preprocessing import MinMaxScaler
+mms = MinMaxScaler()
+X_train_norm = mms.fit_transform(X_train)
+X_test_norm = mms.transform(X_test)
+
+from sklearn.preprocessing import StandardScaler
+
+stdsc = StandardScaler()
+X_train_std = stdsc.fit_transform(X_train)
+X_test_std = stdsc.transform(X_test)
+
+
+ex = pd.DataFrame([0, 1, 2, 3, 4, 5])
+
+# standardize
+ex[1] = (ex[0] - ex[0].mean()) / ex[0].std(ddof=0)
+
+# Please note that pandas uses ddof=1 (sample standard deviation)
+# by default, whereas NumPy's std method and the StandardScaler
+# uses ddof=0 (population standard deviation)
+
+# normalize
+ex[2] = (ex[0] - ex[0].min()) / (ex[0].max() - ex[0].min())
+ex.columns = ['input', 'standardized', 'normalized']
+ex
+#Selecting meaningful features
+
+
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression(penalty='l1',C=1.0,solver='liblinear', multi_class='ovr')
+lr.fit(X_train_std, y_train)
+print('Training accuracy:', lr.score(X_train_std, y_train))
+print('Test accuracy:', lr.score(X_test_std, y_test))
+
+lr.intercept_
+lr.coef_
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure()
+ax = plt.subplot(111)
+
+colors = ['blue', 'green', 'red', 'cyan',
+          'magenta', 'yellow', 'black',
+          'pink', 'lightgreen', 'lightblue',
+          'gray', 'indigo', 'orange']
+
+weights, params = [], []
+for c in np.arange(-4., 6.):
+    lr = LogisticRegression(penalty='l1',C=10.**c,solver='liblinear', multi_class='ovr', random_state=0)
+    lr.fit(X_train_std, y_train)
+    weights.append(lr.coef_[1])
+    params.append(10. ** c)
+
+weights = np.array(weights)
+
+for column, color in zip(range(weights.shape[1]), colors):
+    plt.plot(params, weights[:, column],
+             label=df_wine.columns[column + 1],
+             color=color)
+plt.axhline(0, color='black', linestyle='--', linewidth=3)
+plt.xlim([10 ** (-5), 10 ** 5])
+plt.ylabel('weight coefficient')
+plt.xlabel('C')
+plt.xscale('log')
+plt.legend(loc='upper left')
+ax.legend(loc='upper center',
+          bbox_to_anchor=(1.38, 1.03),
+          ncol=1, fancybox=True)
+# plt.savefig('./figures/l1_path.png', dpi=300)
+plt.show()
 
