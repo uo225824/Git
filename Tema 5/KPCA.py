@@ -395,7 +395,6 @@ def plot_decision_regions(X, y, classifier, test_idx=None, resolution=0.02):
                     marker='o',
                     s=55, label='test set')
 
-print(X_skernpca)
 svm = SVC(kernel='linear', C=1.0, random_state=1)
 svm.fit(X_skernpca, y)
 
