@@ -19,7 +19,7 @@ test = test.values.reshape(-1,28,28,1) / 255.0
 
 class myCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs={}):
-    if(logs.get('accuracy')>0.9999):#'accuracy'
+    if(logs.get('accuracy')>0.97):#'accuracy'
       print("\nReached 96% accuracy so cancelling training!")
       self.model.stop_training = True
 
@@ -42,6 +42,7 @@ model.fit(Xtrain, ytrain, epochs=49,callbacks=[callbacks])
 
 
 #Predict result
+print(model.predict(test))
 result = model.predict(test)
 results = np.argmax(result,axis = 1)
 submission = pd.DataFrame({ 'ImageId' : list(range(1,len(results)+1)),
