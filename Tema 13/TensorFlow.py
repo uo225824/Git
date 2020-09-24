@@ -556,5 +556,5 @@ iris_model_new = tf.keras.models.load_model('iris-classifier.h5')
 
 iris_model_new.summary()
 
-results = iris_model_new.evaluate(ds_test.batch(50), verbose=0)
+results = iris_model_new.evaluate(ds_test.batch(33), verbose=0)
 print('Test loss: {:.4f}   Test Acc.: {:.4f}'.format(*results))
