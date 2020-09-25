@@ -4,7 +4,6 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 ## TF-v1.x style
 
@@ -308,3 +307,223 @@ ax.xaxis.set_label_coords(1, -0.025)
 ax.set_ylabel(r'$x_2$', size=15)
 ax.yaxis.set_label_coords(-0.025, 1)
 plt.show()
+
+
+#Making model building more flexible with Keras' functional API
+
+tf.random.set_seed(1)
+
+##input layer:
+
+inputs=tf.keras.Input(shape=(2,))
+
+#hidden layers
+
+h1=tf.keras.layers.Dense(units=4,activation='relu')(inputs)
+h2=tf.keras.layers.Dense(units=4,activation='relu')(h1)
+h3=tf.keras.layers.Dense(units=4,activation='relu')(h2)
+
+#output
+
+outputs=tf.keras.layers.Dense(units=1,activation='sigmoid')(h3)
+
+#construct a model
+
+model=tf.keras.Model(inputs=inputs,outputs=outputs)
+
+model.summary()
+
+## compile:
+
+model.compile(
+    optimizer=tf.keras.optimizers.SGD(),
+    loss=tf.keras.losses.BinaryCrossentropy(),
+    metrics=[tf.keras.metrics.BinaryAccuracy()]
+)
+
+
+##train
+
+hist=model.fit(
+    x_train,y_train, validation_data=(x_valid,y_valid),
+    epochs=200, batch_size=2, verbose=0
+
+)
+
+
+#Writing custom Keras layers
+
+class NoisyLinear(tf.keras.layers.Layer):
+    def __init__(self, output_dim, noise_stddev=0.1, **kwargs):
+        self.output_dim = output_dim
+        self.noise_stddev = noise_stddev
+        super(NoisyLinear, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        self.w = self.add_weight(name='weights',
+                                 shape=(input_shape[1], self.output_dim),
+                                 initializer='random_normal',
+                                 trainable=True)
+
+        self.b = self.add_weight(shape=(self.output_dim,),
+                                 initializer='zeros',
+                                 trainable=True)
+
+    def call(self, inputs, training=False):
+        if training:
+            batch = tf.shape(inputs)[0]
+            dim = tf.shape(inputs)[1]
+            noise = tf.random.normal(shape=(batch, dim),
+                                     mean=0.0,
+                                     stddev=self.noise_stddev)
+
+            noisy_inputs = tf.add(inputs, noise)
+        else:
+            noisy_inputs = inputs
+        z = tf.matmul(noisy_inputs, self.w) + self.b
+        return tf.keras.activations.relu(z)
+
+    def get_config(self):
+        config = super(NoisyLinear, self).get_config()
+        config.update({'output_dim': self.output_dim,
+                       'noise_stddev': self.noise_stddev})
+        return config
+
+
+## testing:
+
+tf.random.set_seed(1)
+
+noisy_layer = NoisyLinear(4)
+noisy_layer.build(input_shape=(None, 4))
+
+x = tf.zeros(shape=(1, 4))
+tf.print(noisy_layer(x, training=True))
+
+## re-building from config:
+config = noisy_layer.get_config()
+new_layer = NoisyLinear.from_config(config)
+tf.print(new_layer(x, training=True))
+
+
+
+
+tf.random.set_seed(1)
+
+model = tf.keras.Sequential([
+    NoisyLinear(4, noise_stddev=0.1),
+    tf.keras.layers.Dense(units=4, activation='relu'),
+    tf.keras.layers.Dense(units=4, activation='relu'),
+    tf.keras.layers.Dense(units=1, activation='sigmoid')])
+
+model.build(input_shape=(None, 2))
+model.summary()
+
+## compile:
+model.compile(optimizer=tf.keras.optimizers.SGD(),
+              loss=tf.keras.losses.BinaryCrossentropy(),
+              metrics=[tf.keras.metrics.BinaryAccuracy()])
+
+## train:
+hist = model.fit(x_train, y_train,
+                 validation_data=(x_valid, y_valid),
+                 epochs=200, batch_size=2,
+                 verbose=0)
+
+## Plotting
+history = hist.history
+
+fig = plt.figure(figsize=(16, 4))
+ax = fig.add_subplot(1, 3, 1)
+plt.plot(history['loss'], lw=4)
+plt.plot(history['val_loss'], lw=4)
+plt.legend(['Train loss', 'Validation loss'], fontsize=15)
+ax.set_xlabel('Epochs', size=15)
+
+ax = fig.add_subplot(1, 3, 2)
+plt.plot(history['binary_accuracy'], lw=4)
+plt.plot(history['val_binary_accuracy'], lw=4)
+plt.legend(['Train Acc.', 'Validation Acc.'], fontsize=15)
+ax.set_xlabel('Epochs', size=15)
+
+ax = fig.add_subplot(1, 3, 3)
+plot_decision_regions(X=x_valid, y=y_valid.astype(np.integer),
+                      clf=model)
+ax.set_xlabel(r'$x_1$', size=15)
+ax.xaxis.set_label_coords(1, -0.025)
+ax.set_ylabel(r'$x_2$', size=15)
+ax.yaxis.set_label_coords(-0.025, 1)
+plt.show()
+
+
+#Working with feature columns
+
+
+dataset_path = tf.keras.utils.get_file("auto-mpg.data",
+                                       ("http://archive.ics.uci.edu/ml/machine-learning-databases"
+                                        "/auto-mpg/auto-mpg.data"))
+
+column_names = ['MPG', 'Cylinders', 'Displacement', 'Horsepower',
+                'Weight', 'Acceleration', 'ModelYear', 'Origin']
+
+df = pd.read_csv(dataset_path, names=column_names,
+                 na_values = "?", comment='\t',
+                 sep=" ", skipinitialspace=True)
+
+df.tail()
+
+print(df.isna().sum())
+
+df = df.dropna()
+df = df.reset_index(drop=True)
+df.tail()
+
+
+import sklearn
+import sklearn.model_selection
+
+
+df_train, df_test = sklearn.model_selection.train_test_split(df, train_size=0.8)
+train_stats = df_train.describe().transpose()
+train_stats
+
+numeric_column_names = ['Cylinders', 'Displacement', 'Horsepower', 'Weight', 'Acceleration']
+
+df_train_norm, df_test_norm = df_train.copy(), df_test.copy()
+
+for col_name in numeric_column_names:
+    mean = train_stats.loc[col_name, 'mean']
+    std = train_stats.loc[col_name, 'std']
+    df_train_norm.loc[:, col_name] = (df_train_norm.loc[:, col_name] - mean) / std
+    df_test_norm.loc[:, col_name] = (df_test_norm.loc[:, col_name] - mean) / std
+
+df_train_norm.tail()
+
+numeric_features = []
+
+for col_name in numeric_column_names:
+    numeric_features.append(tf.feature_column.numeric_column(key=col_name))
+
+numeric_features
+
+
+feature_year = tf.feature_column.numeric_column(key="ModelYear")
+
+bucketized_features = []
+
+bucketized_features.append(tf.feature_column.bucketized_column(
+    source_column=feature_year,
+    boundaries=[73, 76, 79]))
+
+print(bucketized_features)
+
+feature_origin = tf.feature_column.categorical_column_with_vocabulary_list(
+    key='Origin',
+    vocabulary_list=[1, 2, 3])
+
+categorical_indicator_features = []
+categorical_indicator_features.append(tf.feature_column.indicator_column(feature_origin))
+
+print(categorical_indicator_features)
+
+##Machine learning with pre-made Estimators
